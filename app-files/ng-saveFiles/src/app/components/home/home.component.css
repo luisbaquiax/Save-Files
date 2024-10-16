@@ -1,0 +1,48 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.sidenav .mat-toolbar {
+  background: white;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.content {
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 720px;
+  border-radius: 24px;
+}
+::ng-deep .search-bar .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+::ng-deep .search-bar .mat-form-field-flex {
+  border-radius: 24px;
+  padding: 0 16px;
+}
+::ng-deep .search-bar .mat-form-field-outline {
+  border-radius: 24px;
+}
+::ng-deep .search-bar .mat-form-field-infix {
+  padding: 0.5em 0;
+}
+::ng-deep .search-bar .mat-input-element {
+  margin-top: 0.25em;
+}

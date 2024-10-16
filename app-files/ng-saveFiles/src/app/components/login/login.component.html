@@ -1,0 +1,23 @@
+<div class="div-center">
+  <form class="example-form">
+    <h1 class="text-center font-size mb-5">Iniciar sesión</h1>
+    <mat-form-field class="example-full-width">
+      <mat-label>Nombre de usuario</mat-label>
+      <input matInput placeholder="Ingrese su nombre de usuario" value="">
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width" appearance="fill">
+      <mat-label>Ingrese su contraseña</mat-label>
+      <input matInput [type]="hide ? 'password' : 'text'">
+      <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+        <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="example-button-row">
+      <button mat-raised-button color="primary" class="example-full-width">Iniciar sesion</button>
+    </div>
+    <mat-divider></mat-divider>
+    <p class="text-center pt-3">¿No tienes una cuenta? <a routerLink="/signup">Regístrate aquí</a></p>
+  </form>
+
+</div>
