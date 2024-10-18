@@ -5,7 +5,6 @@
       <button mat-icon-button (click)="toggleSidebar()">
         <mat-icon>{{ isExpanded ? "chevron_left" : "menu" }}</mat-icon>
       </button>
-
     </mat-toolbar>
 
     <mat-nav-list>
@@ -36,12 +35,15 @@
       <form class="example-form mt-4 w-100">
         <mat-form-field appearance="fill" class="search-bar">
           <mat-icon matPrefix>search</mat-icon>
-          <input matInput type="text" placeholder="Buscar en GraFile">
+          <input matInput type="text" placeholder="Buscar en GraFile" />
         </mat-form-field>
-
       </form>
     </mat-toolbar>
     <div class="content">
+      <div class="div-center mb-3">
+          <a mat-raised-button color="" class="mx-1"> <mat-icon>create_new_folder</mat-icon>Crear folder</a>
+          <a mat-raised-button color="" class="mx-1"><mat-icon>upload_file</mat-icon>Subir archivo</a>
+      </div>
 
       <!-- Aquí va el contenido de tu página -->
       <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
@@ -58,7 +60,10 @@
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let element">
-            <a (dblclick)="action1(element.position)" style="text-decoration: none;">
+            <a
+              (dblclick)="action1(element.position)"
+              style="text-decoration: none"
+            >
               <mat-icon>folder</mat-icon>
               {{ element.name }}
             </a>
@@ -87,9 +92,15 @@
 
             <!-- Definición del menú -->
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="action1(element.position)">Opción 1</button>
-              <button mat-menu-item (click)="action1(element.position)">Opción 2</button>
-              <button mat-menu-item (click)="action1(element.position)">Opción 3</button>
+              <button mat-menu-item (click)="action1(element.position)">
+                Opción 1
+              </button>
+              <button mat-menu-item (click)="action1(element.position)">
+                Opción 2
+              </button>
+              <button mat-menu-item (click)="action1(element.position)">
+                Opción 3
+              </button>
             </mat-menu>
           </td>
         </ng-container>
