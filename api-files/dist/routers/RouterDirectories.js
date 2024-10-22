@@ -4,4 +4,7 @@ const express_1 = require("express");
 const DirectoryController_1 = require("../controllers/DirectoryController");
 const router = (0, express_1.Router)();
 router.get('/getRoot/:username', DirectoryController_1.getDirectoryRoot);
+router.get('/list/:idRoot/:estado', DirectoryController_1.getDirectoriesByParent);
+router.get('/carpeta/:id/:estado', DirectoryController_1.getDirectoryByIdAndSatatus);
+router.post('/createDirectory/:nombre/:idParent', DirectoryController_1.createDirectory);
 exports.default = router;

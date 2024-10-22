@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { User } from 'src/app/models/entidad/User';
 import { UserType } from 'src/app/models/enums/UserType';
-import { SesionService } from 'src/app/services/sesion/sesion.service';
 import { UsersService } from 'src/app/services/users/users.service';
 
 @Component({

@@ -8,7 +8,7 @@
     </mat-toolbar>
 
     <mat-nav-list>
-      <a mat-list-item routerLink="">
+      <a mat-list-item (click)="setDirectoryRoot()">
         <mat-icon mat-list-icon>save</mat-icon>
         <span mat-line *ngIf="isExpanded"> Unidad principal</span>
       </a>
@@ -23,6 +23,10 @@
       <a mat-list-item routerLink="/help">
         <mat-icon mat-list-icon>help</mat-icon>
         <span mat-line *ngIf="isExpanded"> Ayuda</span>
+      </a>
+      <a mat-list-item (click)="logout()">
+        <mat-icon mat-list-icon>logout</mat-icon>
+        <span mat-line *ngIf="isExpanded"> Cerrar sesión</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
@@ -41,8 +45,28 @@
     </mat-toolbar>
     <div class="content">
       <div class="div-center mb-3">
-          <a mat-raised-button color="" class="mx-1"> <mat-icon>create_new_folder</mat-icon>Crear folder</a>
-          <a mat-raised-button color="" class="mx-1"><mat-icon>upload_file</mat-icon>Subir archivo</a>
+        <div class="row">
+          <div class="col-auto">
+            <a mat-raised-button color="" (click)="openDialog()">
+              <mat-icon>create_new_folder</mat-icon>Crear folder</a
+            >
+          </div>
+          <div class="col-auto">
+            <a mat-raised-button color="" (click)="openEditor()">
+              <mat-icon>upload_file</mat-icon>Crear archivo
+            </a>
+          </div>
+          <div class="col-auto">
+            <form>
+              <button mat-raised-button type="button" mat-raised-button (click)="fileInput.click()">
+                <mat-icon>add_photo_alternate</mat-icon>Subir imagen
+              </button>
+              <input hidden (change)="uploadImage($event)" #fileInput type="file" accept=".jpg, .png">
+               <!--  <span class="file-name">{{selectedFile?.name}}</span> -->
+            </form>
+          </div>
+        </div>
+
       </div>
 
       <!-- Aquí va el contenido de tu página -->
@@ -51,40 +75,55 @@
               The actual rendered columns are set as a property on the row definition" -->
 
         <!-- Position Column -->
-        <ng-container matColumnDef="position">
-          <th mat-header-cell *matHeaderCellDef>No.</th>
-          <td mat-cell *matCellDef="let element">{{ element.position }}</td>
+        <ng-container matColumnDef="Nombre">
+          <th mat-header-cell *matHeaderCellDef>Nombre</th>
+          <td mat-cell *matCellDef="let element">
+            <a
+              (dblclick)="action1(element)"
+              style="text-decoration: none;"
+              >
+              <mat-icon *ngIf="isDirectory(element)">folder</mat-icon>
+              <mat-icon *ngIf="isFile(element)">description</mat-icon>
+              {{ element.nombre }}
+            </a>
+          </td>
+
         </ng-container>
 
         <!-- Name Column -->
-        <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
+        <ng-container matColumnDef="Propietario">
+          <th mat-header-cell *matHeaderCellDef>Propietario</th>
           <td mat-cell *matCellDef="let element">
-            <a
-              (dblclick)="action1(element.position)"
-              style="text-decoration: none"
-            >
-              <mat-icon>folder</mat-icon>
-              {{ element.name }}
-            </a>
+              <a  (dblclick)="action1(element)" style="text-decoration: none;">
+                {{ user.nombre }}
+              </a>
+
           </td>
         </ng-container>
 
         <!-- Weight Column -->
-        <ng-container matColumnDef="weight">
-          <th mat-header-cell *matHeaderCellDef>Weight</th>
-          <td mat-cell *matCellDef="let element">{{ element.weight }}</td>
+        <ng-container matColumnDef="Fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha creado</th>
+          <td mat-cell *matCellDef="let element">
+            <a  (dblclick)="action1(element)" style="text-decoration: none;">
+              {{ element.createdAt }}
+            </a>
+          </td>
         </ng-container>
 
         <!-- Symbol Column -->
-        <ng-container matColumnDef="symbol">
-          <th mat-header-cell *matHeaderCellDef>Symbol</th>
-          <td mat-cell *matCellDef="let element">{{ element.symbol }}</td>
+        <ng-container matColumnDef="Tipo">
+          <th mat-header-cell *matHeaderCellDef>Tipo</th>
+          <td mat-cell *matCellDef="let element">
+            <a  (dblclick)="action1(element)" style="text-decoration: none;">
+              {{ isDirectory(element) ? 'Carpeta': element.extension }}
+            </a>
+          </td>
         </ng-container>
 
-        <!-- Symbol Column -->
+        <!-- actions Column -->
         <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
           <td mat-cell *matCellDef="let element">
             <button mat-icon-button [matMenuTriggerFor]="menu">
               <mat-icon>more_vert</mat-icon>
@@ -92,13 +131,13 @@
 
             <!-- Definición del menú -->
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="action1(element.position)">
+              <button mat-menu-item (click)="action1(element)">
                 Opción 1
               </button>
-              <button mat-menu-item (click)="action1(element.position)">
+              <button mat-menu-item (click)="action1(element)">
                 Opción 2
               </button>
-              <button mat-menu-item (click)="action1(element.position)">
+              <button mat-menu-item (click)="action1(element)">
                 Opción 3
               </button>
             </mat-menu>
@@ -108,6 +147,7 @@
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
+
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

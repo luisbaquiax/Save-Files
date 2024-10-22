@@ -1,0 +1,14 @@
+
+  <h1 mat-dialog-title>Crear carpeta </h1>
+  <div mat-dialog-content class="with">
+    <mat-form-field appearance="fill" class="w-100">
+      <mat-label>Ingrese nombre de la carpeta</mat-label>
+      <input matInput [(ngModel)]="data.nombre" name="nombre">
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Cancelar</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Crear</button>
+  </div>
+
+

@@ -6,6 +6,7 @@ import path from 'path';
 import { FileState } from '../enums/FileState';
 import { DirectoryType } from '../enums/DirectoryType';
 
+
 export const getUsers = async (request: Request, response: Response) => {
     try {
         const users = await UserModel.find();
@@ -45,7 +46,7 @@ export const insertUser = async (request: Request, response: Response) => {
                 tipo: DirectoryType.ROOT
             });
         raiz.save();
-        crearDirectorio(username);
+        crearDirectorio(rutaDirectorio);
         response.json(userCreate);
     } else {
         response.status(500).json({ msg: "No se pudo guardar al usario." });

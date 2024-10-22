@@ -11,6 +11,7 @@ const SechemaDirectory = new mongoose_1.default.Schema({ username: { type: Strin
     estado: { type: String, required: true },
     username_compartido: { type: String, required: false },
     tipo: { type: String, required: true },
+    contenido: { type: String, required: false }
 }, {
     timestamps: true,
     versionKey: false

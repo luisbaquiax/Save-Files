@@ -18,6 +18,7 @@ const cors_1 = __importDefault(require("cors"));
 const Coneccion_1 = __importDefault(require("../data/Coneccion"));
 const RouterUsers_1 = __importDefault(require("../routers/RouterUsers"));
 const RouterDirectories_1 = __importDefault(require("../routers/RouterDirectories"));
+const RouterFiles_1 = __importDefault(require("../routers/RouterFiles"));
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
@@ -44,6 +45,7 @@ class Server {
         });
         this.app.use('/users', RouterUsers_1.default);
         this.app.use('/directories', RouterDirectories_1.default);
+        this.app.use('/files', RouterFiles_1.default);
     }
     getConeccion() {
         return __awaiter(this, void 0, void 0, function* () {

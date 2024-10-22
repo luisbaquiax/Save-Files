@@ -1,0 +1,56 @@
+<div class="div-center">
+  <div class="box">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="example-form p-3">
+
+      <h1 class="text-center font-size mb-5"><strong>Registro de usuario</strong></h1>
+      <h4 class="text-danger text-center" *ngIf="showMessage">{{ message }}</h4>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Nombre de usuario</mat-label>
+        <input formControlName="username" autocomplete="off" matInput placeholder="username" value="">
+      </mat-form-field>
+
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Nombre</mat-label>
+        <input formControlName="nombre" autocomplete="off" matInput placeholder="Ingrese su nombre de usuario" value="">
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Apellido</mat-label>
+        <input formControlName="apellido" autocomplete="off" matInput placeholder="Ingrese el apellido" value="">
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Correo eléctronico</mat-label>
+        <input formControlName="email" autocomplete="off" matInput placeholder="Ingrese el correo electrónico" value="">
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Ingrese su contraseña</mat-label>
+        <input formControlName="password" autocomplete="off" matInput [type]="hide ? 'password' : 'text'">
+        <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+          <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width" appearance="fill">
+        <mat-label>Confirmar contraseña</mat-label>
+        <input formControlName="password_confirmed" autocomplete="off" matInput [type]="hide2 ? 'password' : 'text'" (keyup)="verfiricarPassword()">
+        <button mat-icon-button matSuffix (click)="hide2 = !hide2" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide2">
+          <mat-icon>{{hide2 ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </mat-form-field>
+      <p >
+        <span *ngIf="showVerification" class="text-success"> {{ messageVerification }} </span>
+        <span *ngIf="!showVerification" class="text-danger"> {{ messageVerification }} </span>
+      </p>
+
+      <div class="example-button-row">
+        <button type="submit" mat-raised-button color="primary" class="example-full-width">Crear cuenta</button>
+      </div>
+      <mat-divider></mat-divider>
+    </form>
+  </div>
+
+</div>

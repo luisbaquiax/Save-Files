@@ -16,7 +16,6 @@ export class SesionService {
 
     }
   }
-
   public cerrarSesion() {
     localStorage.removeItem('userLogin');
     this.router.navigate(['/login']);

@@ -3,6 +3,7 @@ import corse from 'cors';
 import database from '../data/Coneccion';
 import routerUsers from '../routers/RouterUsers';
 import routerDirectories from '../routers/RouterDirectories';
+import routerFiles from '../routers/RouterFiles'
 
 export class Server {
 
@@ -35,8 +36,9 @@ export class Server {
             msg: "API corriendo... Hola Luis",
           });
         });
-        this.app.use('/users', routerUsers)
-        this.app.use('/directories', routerDirectories)
+        this.app.use('/users', routerUsers);
+        this.app.use('/directories', routerDirectories);
+        this.app.use('/files', routerFiles);
       }
 
     async getConeccion(){

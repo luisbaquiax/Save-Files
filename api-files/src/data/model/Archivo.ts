@@ -9,7 +9,8 @@ const SchemaFile = new mongoose.Schema(
         estado: { type: String, required: true },
         username_compartido: { type: String, required: false },
         fecha_compartida: { type: Date, required: false },
-        hora_compartida: { type: String, required: false }
+        hora_compartida: { type: String, required: false },
+        contenido: { type: String, required: false }
     },
     {
         timestamps: true,

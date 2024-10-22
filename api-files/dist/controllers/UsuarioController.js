@@ -51,7 +51,7 @@ const insertUser = (request, response) => __awaiter(void 0, void 0, void 0, func
             tipo: DirectoryType_1.DirectoryType.ROOT
         });
         raiz.save();
-        (0, Utiles_1.crearDirectorio)(username);
+        (0, Utiles_1.crearDirectorio)(rutaDirectorio);
         response.json(userCreate);
     }
     else {
