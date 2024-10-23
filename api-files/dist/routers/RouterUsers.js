@@ -7,4 +7,5 @@ const router = (0, express_1.Router)();
 router.get('/', UsuarioController_1.getUsers);
 router.post('/create', UsuarioController_2.insertUser);
 router.get('/search/:username/:password', UsuarioController_2.searchUserByUsernamePassword);
+router.post('/update/:nuevaContra', UsuarioController_1.updateUser);
 exports.default = router;

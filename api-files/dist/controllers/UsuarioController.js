@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
+exports.updateUser = exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
 const Utiles_1 = require("./../utils/Utiles");
 const Usuario_1 = __importDefault(require("../data/model/Usuario"));
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
@@ -97,3 +97,21 @@ const searchUser = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.searchUser = searchUser;
+const updateUser = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { nuevaContra } = request.params;
+        const { username } = request.body;
+        const usuarioBuscado = yield Usuario_1.default.findOne({ username: username });
+        if (!usuarioBuscado) {
+            response.status(404).json({ message: `User not found` });
+            return;
+        }
+        usuarioBuscado.password = yield usuarioBuscado.encryptPassword(nuevaContra);
+        usuarioBuscado.save();
+        response.json({ message: `Se ha cambiado la contraseña correctamente` });
+    }
+    catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+});
+exports.updateUser = updateUser;

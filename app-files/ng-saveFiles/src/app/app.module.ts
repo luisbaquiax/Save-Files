@@ -36,6 +36,7 @@ import { HomeDialogDirectoryComponent } from './components/home-dialog-directory
 import { RegisterComponent } from './components/register/register.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { SelectImageComponent } from './components/select-image/select-image.component';
+import { ChangePasswordComponent } from './components/change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { SelectImageComponent } from './components/select-image/select-image.com
     HomeDialogDirectoryComponent,
     EditorComponent,
     RegisterComponent,
-    SelectImageComponent
+    SelectImageComponent,
+    ChangePasswordComponent
   ],
   imports: [
     BrowserModule,

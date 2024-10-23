@@ -1,4 +1,6 @@
 export enum Extensiones {
   TXT = '.txt',
-  HTML = '.html'
+  HTML = '.html',
+  PNG = '.png',
+  JPG = '.jpg'
 }

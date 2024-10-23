@@ -17,6 +17,7 @@ const Utiles_1 = require("../utils/Utiles");
 const path_1 = __importDefault(require("path"));
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
 const DirectoryType_1 = require("../enums/DirectoryType");
+const FileState_1 = require("../enums/FileState");
 const createDirectory = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { nombre, idParent } = request.params;
@@ -25,7 +26,7 @@ const createDirectory = (request, response) => __awaiter(void 0, void 0, void 0,
             delete carpeta._id;
         }
         const buscado = yield Directorio_1.default.findOne({
-            nombre: nombre, id_directory: idParent
+            nombre: nombre, id_directory: idParent, estado: FileState_1.FileState.ACTIVO
         });
         if (buscado) {
             response.status(409).json({ message: `La carpeta ${nombre} ya existe` });

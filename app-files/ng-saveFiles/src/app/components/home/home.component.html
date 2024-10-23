@@ -24,6 +24,10 @@
         <mat-icon mat-list-icon>help</mat-icon>
         <span mat-line *ngIf="isExpanded"> Ayuda</span>
       </a>
+      <a mat-list-item (click)="openDialogPassword()">
+        <mat-icon mat-list-icon>key</mat-icon>
+        <span mat-line *ngIf="isExpanded"> Cambiar contraseña</span>
+      </a>
       <a mat-list-item (click)="logout()">
         <mat-icon mat-list-icon>logout</mat-icon>
         <span mat-line *ngIf="isExpanded"> Cerrar sesión</span>
@@ -52,18 +56,15 @@
             >
           </div>
           <div class="col-auto">
-            <a mat-raised-button color="" (click)="openEditor()">
+            <a mat-raised-button color="" (click)="openEditor(null)">
               <mat-icon>upload_file</mat-icon>Crear archivo
             </a>
           </div>
           <div class="col-auto">
-            <form>
               <button mat-raised-button type="button" mat-raised-button (click)="fileInput.click()">
                 <mat-icon>add_photo_alternate</mat-icon>Subir imagen
               </button>
               <input hidden (change)="uploadImage($event)" #fileInput type="file" accept=".jpg, .png">
-               <!--  <span class="file-name">{{selectedFile?.name}}</span> -->
-            </form>
           </div>
         </div>
 
@@ -131,14 +132,24 @@
 
             <!-- Definición del menú -->
             <mat-menu #menu="matMenu">
-              <button mat-menu-item (click)="action1(element)">
-                Opción 1
+              <button mat-menu-item (click)="editFile(element)" *ngIf="isFile(element) && !isImage(element)">
+                Editar
               </button>
-              <button mat-menu-item (click)="action1(element)">
-                Opción 2
+
+              <button mat-menu-item
+                type="button"
+                (click)="fileInput.click()"
+                *ngIf="isFile(element) && isImage(element)"
+                >
+                Cambiar imagen
               </button>
-              <button mat-menu-item (click)="action1(element)">
-                Opción 3
+              <input hidden (change)="uploadImageChange($event, element)" #fileInput type="file" accept=".jpg, .png">
+
+              <button mat-menu-item (click)="shareFile(element)" *ngIf="isFile(element)">
+                Compartir
+              </button>
+              <button mat-menu-item (click)="deleteDirectoryOrFile(element)">
+                Eliminar
               </button>
             </mat-menu>
           </td>

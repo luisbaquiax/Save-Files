@@ -91,3 +91,26 @@ export const searchUser = async (request: Request, response: Response) => {
         response.status(500).json({ message: `Error en el servidor ${error}` });
     }
 }
+
+export const updateUser = async (request: Request, response: Response) => {
+    try {
+        const { nuevaContra } = request.params;
+        const { username } = request.body;
+        
+        const usuarioBuscado = await UserModel.findOne({ username: username });
+
+        if (!usuarioBuscado) {
+            response.status(404).json({ message: `User not found` });
+            return;
+        }
+
+        usuarioBuscado.password = await usuarioBuscado.encryptPassword(nuevaContra);
+
+        usuarioBuscado.save();
+
+        response.json({ message: `Se ha cambiado la contraseña correctamente` });
+
+    } catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+}

@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import * as fs2 from 'fs';
+import multer from 'multer';
 
 export const rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
 

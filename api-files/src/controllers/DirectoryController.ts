@@ -3,6 +3,7 @@ import { crearDirectorio, rutaFiles } from "../utils/Utiles";
 import path from 'path';
 import DirectoryModel from "../data/model/Directorio";
 import { DirectoryType } from "../enums/DirectoryType";
+import { FileState } from "../enums/FileState";
 
 export const createDirectory = async (request: Request, response: Response) => {
     try {
@@ -14,7 +15,7 @@ export const createDirectory = async (request: Request, response: Response) => {
         }
 
         const buscado = await DirectoryModel.findOne({
-            nombre: nombre, id_directory: idParent
+            nombre: nombre, id_directory: idParent, estado: FileState.ACTIVO
         });
 
         if (buscado) {

@@ -8,8 +8,9 @@ import { Observable } from 'rxjs';
 })
 export class UsersService {
 
-  url: string = 'http://localhost:3000/users/search/:username/:password'
-  urlApi: string = 'http://localhost:3000/users/'
+  url: string = 'http://localhost:3000/users/search/:username/:password';
+  urlApi: string = 'http://localhost:3000/users/';
+  urlUpdate: string = 'http://localhost:3000/users/update/';
 
   constructor(private http: HttpClient) { }
 
@@ -19,5 +20,9 @@ export class UsersService {
 
   public createUser(user: User): Observable<User> {
     return this.http.post<User>(this.urlApi + 'create', user);
+  }
+
+  public update(user: User, password: string): Observable<any> {
+    return this.http.post<any>(this.urlUpdate + `${password}`, user);
   }
 }

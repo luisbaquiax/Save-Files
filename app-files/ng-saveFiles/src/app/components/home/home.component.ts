@@ -15,6 +15,8 @@ import { Extensiones } from 'src/app/models/enums/Extensiones';
 import { Archivo } from 'src/app/models/entidad/Archivo';
 import { ServiceFilesService } from 'src/app/services/serviceFiles/serviceFiles.service';
 import { Dir } from '@angular/cdk/bidi';
+import { ChangePasswordComponent } from '../change-password/change-password.component';
+import { UsersService } from 'src/app/services/users/users.service';
 
 @Component({
   selector: 'app-home',
@@ -34,7 +36,8 @@ export class HomeComponent implements OnInit {
 
   dataSource: any[] = [];
   directories: Directory[] = [];
-  files: Archivo [] = [];
+  files: Archivo[] = [];
+  archivoActual!: Archivo;
 
   editorForm: FormGroup;
 
@@ -44,6 +47,7 @@ export class HomeComponent implements OnInit {
     private session: SesionService,
     private serviceDirectory: DirectoryService,
     private serviceFile: ServiceFilesService,
+    private serviceUser: UsersService,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private fb: FormBuilder
@@ -82,9 +86,9 @@ export class HomeComponent implements OnInit {
   }
 
   action1(directory: Directory | any) {
-    if(this.isDirectory(directory)){
+    if (this.isDirectory(directory)) {
       this.serviceDirectory.getDirectoryByIdStatus(directory._id, FileState.ACTIVO).subscribe(
-        (data)=>{
+        (data) => {
           this.directoryActual = data;
           this.updateDirectories(directory);
         }
@@ -92,12 +96,40 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  shareDirectory(idCarpeta: string) {
-    console.log('position ', idCarpeta);
+  editFile(archivo: Archivo) {
+    this.openEditor(archivo);
   }
-  deleteDirectory(idCarpeta: string) {
-    console.log('position ', idCarpeta);
+
+  openDialgoEditFile(archivo: any) {
+
   }
+
+  shareFile(idCarpeta: string) {
+  }
+  deleteDirectoryOrFile(idCarpeta: string) {
+  }
+
+  updateDirectories(directory: Directory) {
+    this.serviceDirectory.getDirectoriesByIdParent(directory._id, FileState.ACTIVO).subscribe(
+      (list) => {
+        this.directories = list;
+        this.updateFileByDirectory(directory, FileState.ACTIVO);
+      }
+    );
+  }
+
+  updateFileByDirectory(directory: Directory, estado: string) {
+    this.serviceFile.filesByDirectory(directory._id, estado).subscribe(
+      (data) => {
+        this.files = data;
+        this.dataSource = [...this.directories, ...this.files];
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
 
   openDialog() {
     const dialogRef = this.dialog.open(HomeDialogDirectoryComponent, {
@@ -136,9 +168,9 @@ export class HomeComponent implements OnInit {
         },
         (error) => {
           console.log(error);
-          if(error.status === 409){
+          if (error.status === 409) {
             this.snackBar.open(`La carpeta ${carpeta.nombre} ya existe`, "Cerrar", { duration: 2000 });
-          }else{
+          } else {
             this.snackBar.open(`Ne se pudo crear la carpeta, los sentimos`, "Cerrar", { duration: 2000 });
           }
         }
@@ -146,35 +178,14 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  updateDirectories(directory: Directory){
-    this.serviceDirectory.getDirectoriesByIdParent(directory._id, FileState.ACTIVO).subscribe(
-      (list)=>{
-        this.directories = list;
-        this.updateFileByDirectory(directory, FileState.ACTIVO);
-      }
-    );
-  }
+  openEditor(archivo: Archivo | null) {
+    const edicion: Editor = {
+      nombre: archivo ? archivo.nombre : '',
+      content: archivo ? archivo.contenido : '',
+      type: archivo ? archivo.extension : Extensiones.TXT
+    }
 
-  updateFileByDirectory(directory: Directory, estado: string) {
-    this.serviceFile.filesByDirectory(directory._id, estado).subscribe(
-      (data) => {
-        this.files = data;
-        this.dataSource = [...this.directories, ...this.files];
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
-  openEditor(){
-    const dialogRef = this.dialog.open(EditorComponent, {
-      data: {
-        nombre: '',
-        content: '',
-        type: Extensiones.TXT,
-      },
-    });
+    const dialogRef = this.dialog.open(EditorComponent, { data: edicion });
 
     dialogRef.afterClosed().subscribe(result => {
       const editor: Editor = {
@@ -183,60 +194,144 @@ export class HomeComponent implements OnInit {
         content: result.content,
       }
       console.log(editor);
-      if(editor.nombre.length == 0){
+      if (editor.nombre.length == 0) {
         this.snackBar.open("El nombre de archivo no puede estar vacío", "Cerrar", { duration: 2000 });
         return;
       }
-      const nuevoArchivo: Archivo = {
-        _id: '',
-        id_directory: this.directoryActual._id,
-        nombre: editor.nombre,
-        ruta: '',
-        extension: editor.type,
-        estado: FileState.ACTIVO,
-        username_compartido: '',
-        fecha_compartida: '',
-        hora_compartida: '',
-        contenido: editor.content,
-        createdAt: '',
-        updatedAt: '',
-      }
 
-      this.serviceFile.create(nuevoArchivo).subscribe(
-        ()=>{
-          this.updateDirectories(this.directoryActual)
-          this.snackBar.open('Archivo creado correctamente', 'Cerrar')
-        },
-        (error)=>{
-          console.log(error)
-          this.snackBar.open('No se pudo guardar el archivo', 'Cerrar')
-        }
-      );
+      if (archivo) {
+        this.updateFile(archivo);
+      } else {
+        this.createFile(editor);
+      }
     });
+
   }
 
-  isDirectory(element: any){
+  createFile(editor: Editor) {
+    const nuevoArchivo: Archivo = {
+      _id: '',
+      id_directory: this.directoryActual._id,
+      nombre: editor.nombre + editor.type,
+      ruta: '',
+      extension: editor.type,
+      estado: FileState.ACTIVO,
+      username_compartido: '',
+      fecha_compartida: '',
+      hora_compartida: '',
+      contenido: editor.content,
+      createdAt: '',
+      updatedAt: '',
+    }
+    this.serviceFile.create(nuevoArchivo).subscribe(
+      () => {
+        this.updateDirectories(this.directoryActual)
+        this.snackBar.open('Archivo creado correctamente', 'Cerrar')
+      },
+      (error) => {
+        console.log(error)
+        if (error.status == 409) {
+          this.snackBar.open(`El archivo ${nuevoArchivo.nombre} ya existe`, 'Cerrar', { duration: 2000 });
+        } else {
+          this.snackBar.open('No se pudo guardar el archivo', 'Cerrar');
+        }
+      }
+    );
+  }
+
+  updateFile(archivo: Archivo) {
+    console.log('actualizando archivo ', archivo);
+  }
+
+  openDialogPassword() {
+    const diagloPassword = this.dialog.open(ChangePasswordComponent, {
+      data: {
+        password: '',
+      }
+    })
+    diagloPassword.afterClosed().subscribe(
+      (result: User) => {
+        const newPassword = result.password;
+        console.log('newPassword ', newPassword);
+        if (newPassword.length == 0) {
+          this.snackBar.open('La nueva contraseña no puede estar vacía', 'Cerrar', { duration: 2000 });
+          return;
+        }
+        this.serviceUser.update(this.user, newPassword).subscribe(() => {
+          this.snackBar.open('La contraseña ha sido cambiado correctamente', 'Cerrar', { duration: 2000 });
+        });
+      }
+    );
+  }
+
+
+  isDirectory(element: any) {
     return element.hasOwnProperty('tipo');
   }
 
-  isFile(element: any){
+  isFile(element: any) {
     return element.hasOwnProperty('extension');
+  }
+
+  isImage(archivo: Archivo){
+    return archivo.extension == Extensiones.JPG || archivo.extension == Extensiones.PNG;
   }
 
   onNoClick() {
     console.log('');
   }
 
-  uploadImage(event: any){
+  uploadImage(event: any) {
     this.selectedFile = event.target.files[0];
-    if(this.selectedFile){
+    if (this.selectedFile) {
       const descriptionFile = this.selectedFile.name.split('.');
-      console.log('nombre ' , descriptionFile[0]);
-      console.log('extension ',descriptionFile[1]);
-    }else{
+      const fileExtension = '.' + descriptionFile[descriptionFile.length - 1];
+
+      const archivo: Archivo = {
+        _id: '',
+        id_directory: this.directoryActual._id,
+        nombre: this.selectedFile.name,
+        ruta: this.directoryActual.ruta,
+        extension: fileExtension,
+        estado: FileState.ACTIVO,
+        username_compartido: this.user.username,
+        fecha_compartida: '',
+        hora_compartida: '',
+        contenido: '',
+        createdAt: '',
+        updatedAt: '',
+      }
+
+      if (fileExtension == Extensiones.PNG || fileExtension == Extensiones.JPG) {
+        console.log('todo bien')
+        const form = new FormData();
+        form.append('archivo', this.selectedFile);
+        form.append('archivoJson', JSON.stringify(archivo));
+        this.serviceFile.sendFile(form).subscribe(
+          () => {
+            this.updateDirectories(this.directoryActual)
+            this.snackBar.open(`Se ha guardado correctamente el archivo`, 'Cerrar', { duration: 2000 })
+          },
+          (error) => {
+            if (error.status == 401) {
+              this.snackBar.open(`El archivo ${archivo.nombre} ya existe`, 'Cerrar', { duration: 2000 })
+            } else {
+              console.log(error)
+            }
+          }
+        );
+      } else {
+        this.snackBar.open(`Tipo de imagen ${descriptionFile[0]} no permitido`, 'Cerrar', { duration: 2000 })
+      }
+    } else {
       this.snackBar.open('No se seleccionó nigún archivo', 'Cerrar', { duration: 2000 })
     }
   }
+
+  uploadImageChange(event: any, archivo: Archivo){
+     console.log('cambiando imagen ', archivo)
+  }
+
 
   logout() {
     this.session.cerrarSesion();
