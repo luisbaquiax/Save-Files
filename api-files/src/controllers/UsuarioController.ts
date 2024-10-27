@@ -5,11 +5,12 @@ import DirectoryModel from '../data/model/Directorio';
 import path from 'path';
 import { FileState } from '../enums/FileState';
 import { DirectoryType } from '../enums/DirectoryType';
+import { UserType } from '../enums/UserType';
 
 
 export const getUsers = async (request: Request, response: Response) => {
     try {
-        const users = await UserModel.find();
+        const users = await UserModel.find({ rol: UserType.EMPLEADO });
         response.json(users);
     } catch (error) {
         response.status(500).json({ message: `Error en el servidor ${error}` });
@@ -45,8 +46,8 @@ export const insertUser = async (request: Request, response: Response) => {
                 username_compartido: username,
                 tipo: DirectoryType.ROOT
             });
-        raiz.save();
-        crearDirectorio(rutaDirectorio);
+        await raiz.save();
+        //crearDirectorio(rutaDirectorio);
         response.json(userCreate);
     } else {
         response.status(500).json({ msg: "No se pudo guardar al usario." });
@@ -110,6 +111,16 @@ export const updateUser = async (request: Request, response: Response) => {
 
         response.json({ message: `Se ha cambiado la contraseña correctamente` });
 
+    } catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+}
+
+export const getUsersByStatus = async (request: Request, response: Response) => {
+    try {
+        const { idUser } = request.params;
+        const users = await UserModel.find({ _id: { $ne: idUser } });
+        response.json(users);
     } catch (error) {
         response.status(500).json({ message: `Error en el servidor ${error}` });
     }

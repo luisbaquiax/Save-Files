@@ -11,9 +11,9 @@ const SchemaFile = new mongoose_1.default.Schema({
     extension: { type: String, required: true },
     estado: { type: String, required: true },
     username_compartido: { type: String, required: false },
-    fecha_compartida: { type: Date, required: false },
-    hora_compartida: { type: String, required: false },
-    contenido: { type: String, required: false }
+    propietario: { type: String, required: false },
+    contenido: { type: String, required: true },
+    tipo_archivo: { type: String, required: true }
 }, {
     timestamps: true,
     versionKey: false

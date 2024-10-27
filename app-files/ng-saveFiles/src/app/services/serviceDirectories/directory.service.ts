@@ -12,6 +12,7 @@ export class DirectoryService {
   urlList: string = 'http://localhost:3000/directories/list/';
   urlCarpeta: string = 'http://localhost:3000/directories/carpeta/';
   urlCreate: string =  'http://localhost:3000/directories/createDirectory/';
+  urlUpdate: string = 'http://localhost:3000/directories/update';
 
   constructor(private http: HttpClient) { }
 
@@ -29,6 +30,10 @@ export class DirectoryService {
 
   public create(nombre: string, idParent: string, carpeta: Directory): Observable<Directory> {
     return this.http.post<Directory>(this.urlCreate + `${nombre}/${idParent}`, carpeta);
+  }
+
+  public update(direcory: Directory): Observable<any> {
+    return this.http.put<any>(this.urlUpdate, { carpeta: direcory });
   }
 
 }

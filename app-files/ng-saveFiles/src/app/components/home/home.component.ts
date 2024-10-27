@@ -1,3 +1,4 @@
+import { UsersListComponent } from './../UsersList/UsersList.component';
 import { Component, OnInit } from '@angular/core';
 import { Directory } from 'src/app/models/entidad/Directory';
 import { User } from 'src/app/models/entidad/User';
@@ -17,6 +18,8 @@ import { ServiceFilesService } from 'src/app/services/serviceFiles/serviceFiles.
 import { Dir } from '@angular/cdk/bidi';
 import { ChangePasswordComponent } from '../change-password/change-password.component';
 import { UsersService } from 'src/app/services/users/users.service';
+import { getNameFile, getDefaultContentFile } from 'src/app/models/Utiles';
+import { FileType } from 'src/app/models/enums/FileType';
 
 @Component({
   selector: 'app-home',
@@ -25,6 +28,8 @@ import { UsersService } from 'src/app/services/users/users.service';
 })
 
 export class HomeComponent implements OnInit {
+
+  nameProject: string = 'GraFiles';
 
   displayedColumns: string[] = ['Nombre', 'Propietario', 'Fecha', 'Tipo', 'actions'];
 
@@ -37,9 +42,14 @@ export class HomeComponent implements OnInit {
   dataSource: any[] = [];
   directories: Directory[] = [];
   files: Archivo[] = [];
+  filesShareds: Archivo[] = [];
   archivoActual!: Archivo;
+  users: User[] = [];
 
   editorForm: FormGroup;
+
+  showHome: boolean = true;
+  showShareds: boolean = false;
 
   selectedFile: File | undefined;
 
@@ -69,6 +79,8 @@ export class HomeComponent implements OnInit {
   }
 
   setDirectoryRoot() {
+    this.showHome = true;
+    this.showShareds = false;
     this.serviceDirectory.getRoot(this.user.username).subscribe((data) => {
       this.directoryRoot = data;
       this.directoryActual = data;
@@ -79,6 +91,23 @@ export class HomeComponent implements OnInit {
         }
       );
     });
+  }
+
+  setUsersByStatus() {
+    this.serviceUser.getUsersByStatus(this.user._id).subscribe((users) => {
+      this.users = users;
+    })
+  }
+
+  setShareds() {
+    this.showHome = false;
+    this.showShareds = true;
+    this.serviceFile.filesShareds(this.user.username).subscribe(
+      (data) => {
+        this.filesShareds = data;
+        this.dataSource = data;
+      }
+    );
   }
 
   toggleSidebar() {
@@ -99,22 +128,60 @@ export class HomeComponent implements OnInit {
   editFile(archivo: Archivo) {
     this.openEditor(archivo);
   }
+  shareFile(element: Archivo) {
+    const dialogRef = this.dialog.open(UsersListComponent, {
+      width: '350px',
+      data: {
+        username: String
+      }
+    });
 
-  openDialgoEditFile(archivo: any) {
+    dialogRef.afterClosed().subscribe((result: string) => {
+      if (result) {
 
+        element.username_compartido = result;
+        if (element.username_compartido.length == 0) {
+          this.snackBar.open('Debe seleccionar un usuario', 'Cerrar', { duration: 2000 });
+          return;
+        }
+        element.tipo_archivo = FileState.COMPARTIDO;
+        let archivoTipo = FileType.TXT;
+        if (this.isImage(element)) {
+          archivoTipo = FileType.IMG;
+          console.log('es imagen');
+        }
+        this.serviceFile.createShared(element, archivoTipo).subscribe(
+          (data) => {
+            this.snackBar.open('Se ha compartido exitosamente el archivo', 'Cerrar', { duration: 2000 });
+          },
+          (error) => {
+            console.log(error);
+            this.snackBar.open('No se pudo compartir el archivo', 'Cerrar', { duration: 2000 });
+          }
+        );
+      }
+    });
+  }
+  deleteDirectoryOrFile(element: any) {
+    console.log('element ', element);
+    element.estado = FileState.ELIMINADO;
+    if (this.isDirectory(element)) {
+      this.updateDirectory(element, 'Carpeta eliminado correctamente');
+    } else {
+      this.updateFile(element, 'Se ha eliminado correctamente el archivo');
+    }
   }
 
-  shareFile(idCarpeta: string) {
-  }
-  deleteDirectoryOrFile(idCarpeta: string) {
+  copyElement(element: any) {
+    console.log('copiar elemento ')
   }
 
-  updateDirectories(directory: Directory) {
-    this.serviceDirectory.getDirectoriesByIdParent(directory._id, FileState.ACTIVO).subscribe(
+  updateDirectories(directoryActual: Directory) {
+    this.serviceDirectory.getDirectoriesByIdParent(directoryActual._id, FileState.ACTIVO).subscribe(
       (list) => {
         this.directories = list;
-        this.updateFileByDirectory(directory, FileState.ACTIVO);
-      }
+        this.updateFileByDirectory(directoryActual, FileState.ACTIVO);
+      },
     );
   }
 
@@ -129,7 +196,6 @@ export class HomeComponent implements OnInit {
       }
     );
   }
-
 
   openDialog() {
     const dialogRef = this.dialog.open(HomeDialogDirectoryComponent, {
@@ -180,7 +246,7 @@ export class HomeComponent implements OnInit {
 
   openEditor(archivo: Archivo | null) {
     const edicion: Editor = {
-      nombre: archivo ? archivo.nombre : '',
+      nombre: archivo ? getNameFile(archivo.nombre) : '',
       content: archivo ? archivo.contenido : '',
       type: archivo ? archivo.extension : Extensiones.TXT
     }
@@ -200,7 +266,10 @@ export class HomeComponent implements OnInit {
       }
 
       if (archivo) {
-        this.updateFile(archivo);
+        archivo.nombre = editor.nombre + editor.type;
+        archivo.contenido = editor.content;
+        archivo.extension = editor.type;
+        this.updateFile(archivo, 'Se ha actualizado correctamente el archivo');
       } else {
         this.createFile(editor);
       }
@@ -217,11 +286,14 @@ export class HomeComponent implements OnInit {
       extension: editor.type,
       estado: FileState.ACTIVO,
       username_compartido: '',
-      fecha_compartida: '',
-      hora_compartida: '',
+      propietario: this.user.username,
+      tipo_archivo: FileType.NORMAL,
       contenido: editor.content,
       createdAt: '',
       updatedAt: '',
+    }
+    if (nuevoArchivo.contenido.length == 0) {
+      nuevoArchivo.contenido = ' ';
     }
     this.serviceFile.create(nuevoArchivo).subscribe(
       () => {
@@ -239,8 +311,37 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  updateFile(archivo: Archivo) {
-    console.log('actualizando archivo ', archivo);
+  updateFile(archivo: Archivo, message: string) {
+    this.serviceFile.updateFile(archivo).subscribe(() => {
+      this.snackBar.open('Se ha actualizado correctamente el acrhivo.', 'Cerrar', { duration: 2000 });
+      if (this.showShareds) {
+        this.setShareds();
+      } else {
+        this.updateDirectories(this.directoryActual);
+      }
+    },
+      (error) => {
+        console.log(error)
+        if (error.status == 404) {
+          this.snackBar.open(message, 'Cerrar', { duration: 2000 });
+        } else if (error.status == 409) {
+          this.snackBar.open(`El archivo ${archivo.nombre} ya existe`, 'Cerrar', { duration: 2000 });
+        } else {
+          this.snackBar.open('No se pudo actualizar el archivo', 'Cerrar');
+        }
+      }
+    );
+  }
+
+  updateDirectory(element: Directory, message: string) {
+    this.serviceDirectory.update(element).subscribe(() => {
+      this.updateDirectories(this.directoryActual);
+      this.snackBar.open(message, 'Cerrar', { duration: 2000 })
+    },
+      (error) => {
+        this.snackBar.open('No se pudo realizar la accion', 'Cerrar', { duration: 2000 })
+      }
+    );
   }
 
   openDialogPassword() {
@@ -273,7 +374,7 @@ export class HomeComponent implements OnInit {
     return element.hasOwnProperty('extension');
   }
 
-  isImage(archivo: Archivo){
+  isImage(archivo: Archivo) {
     return archivo.extension == Extensiones.JPG || archivo.extension == Extensiones.PNG;
   }
 
@@ -294,10 +395,10 @@ export class HomeComponent implements OnInit {
         ruta: this.directoryActual.ruta,
         extension: fileExtension,
         estado: FileState.ACTIVO,
-        username_compartido: this.user.username,
-        fecha_compartida: '',
-        hora_compartida: '',
-        contenido: '',
+        username_compartido: ' ',
+        propietario: this.user.username,
+        tipo_archivo: FileType.NORMAL,
+        contenido: getDefaultContentFile(),
         createdAt: '',
         updatedAt: '',
       }
@@ -328,8 +429,8 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  uploadImageChange(event: any, archivo: Archivo){
-     console.log('cambiando imagen ', archivo)
+  uploadImageChange(event: any, archivo: Archivo) {
+    console.log('cambiando imagen ', archivo)
   }
 
 

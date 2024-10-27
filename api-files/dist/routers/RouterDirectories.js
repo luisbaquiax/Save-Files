@@ -7,4 +7,5 @@ router.get('/getRoot/:username', DirectoryController_1.getDirectoryRoot);
 router.get('/list/:idRoot/:estado', DirectoryController_1.getDirectoriesByParent);
 router.get('/carpeta/:id/:estado', DirectoryController_1.getDirectoryByIdAndSatatus);
 router.post('/createDirectory/:nombre/:idParent', DirectoryController_1.createDirectory);
+router.put('/update', DirectoryController_1.updateDirectory);
 exports.default = router;

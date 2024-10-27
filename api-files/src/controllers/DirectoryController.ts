@@ -19,32 +19,31 @@ export const createDirectory = async (request: Request, response: Response) => {
         });
 
         if (buscado) {
-             response.status(409).json({ message: `La carpeta ${nombre} ya existe` });
-             return;
+            response.status(409).json({ message: `La carpeta ${nombre} ya existe` });
+            return;
         }
-            const carpetaPadre = await DirectoryModel.findOne({
-                _id: idParent
-            })
-    
-            const carpetaNueva = new DirectoryModel(carpeta);
-    
-            if (!carpetaPadre) {
-                 response.status(404).json({ message: `No se encontró la carepta padre.` });
-                 return;
-            } 
+        const carpetaPadre = await DirectoryModel.findOne({
+            _id: idParent
+        })
 
-            const rutaCarpeta = carpetaPadre.ruta + path.sep + nombre
-    
-            carpetaNueva.ruta = rutaCarpeta;
+        const carpetaNueva = new DirectoryModel(carpeta);
 
-            await carpetaNueva.save();
+        if (!carpetaPadre) {
+            response.status(404).json({ message: `No se encontró la carepta padre.` });
+            return;
+        }
 
-            crearDirectorio(rutaCarpeta);
+        const rutaCarpeta = nombre
 
-             response.json({ message: `Se ha guardado la carpeta con éxito.` });
+        carpetaNueva.ruta = rutaCarpeta;
+
+        await carpetaNueva.save();
+
+
+        response.json({ message: `Se ha guardado la carpeta con éxito.` });
 
     } catch (error) {
-         response.status(500).json({ message: `Error en el servidos ${error}` })
+        response.status(500).json({ message: `Error en el servidos ${error}` })
     }
 }
 
@@ -80,7 +79,7 @@ export const getDirectoriesByParent = async (request: Request, response: Respons
     }
 }
 
-export const getDirectoryByIdAndSatatus = async (request: Request, response: Response)=>{
+export const getDirectoryByIdAndSatatus = async (request: Request, response: Response) => {
     try {
         const { id, estado } = request.params;
         const carpeta = await DirectoryModel.findOne({
@@ -94,16 +93,30 @@ export const getDirectoryByIdAndSatatus = async (request: Request, response: Res
         }
 
         response.json(carpeta);
-        
+
     } catch (error) {
         response.status(500).json({ message: `Errro en el servidor: ${error}` });
     }
 }
 
-export const getDirectoriesByUsername = async (request: Request, response: Response) => {
+export const updateDirectory = async (request: Request, response: Response) => {
     try {
+        const { carpeta } = request.body;
 
+        const buscado = await DirectoryModel.findOne({ _id: carpeta._id });
+        if (!buscado) {
+            response.status(404).json({ message: `Carpeta no encontrada` });
+            return;
+        }
+
+        buscado.nombre = carpeta.nombre;
+        buscado.id_directory = carpeta.id_directory;
+        buscado.estado = carpeta.estado;
+
+        await buscado.save();
+
+        response.json({ message: `Carpeta actualizado con éxito.` });
     } catch (error) {
         response.status(500).json({ message: `Error en el servidor ${error}` });
     }
-}
+};

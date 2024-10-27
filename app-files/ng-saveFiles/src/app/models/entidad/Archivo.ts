@@ -6,9 +6,9 @@ export interface Archivo {
   extension: string;
   estado: string;
   username_compartido: string;
-  fecha_compartida: string;
-  hora_compartida: string;
+  propietario: string;
   contenido: string;
+  tipo_archivo: string;
   createdAt: string;
   updatedAt: string;
 }

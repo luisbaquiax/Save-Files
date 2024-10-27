@@ -1,8 +1,9 @@
 import { promises as fs } from 'fs';
 import * as fs2 from 'fs';
-import multer from 'multer';
+import path from 'path';
 
 export const rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
+export const rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
 
 export const crearDirectorio = async (ruta: string) => {
     try {
@@ -18,7 +19,7 @@ export const writeFile = async (ruta: string, content: string) => {
         await fs.writeFile(ruta, content, {
             flag: "w"
         }).then(() => {
-            console.log("se ha escrito el archivo")
+            console.log("se ha escrito el archivo ", ruta)
         })
     } catch (error) {
         console.log(`Error al crear el archivo ${error}`);
@@ -39,3 +40,9 @@ export const readFile = (rutaArchivo: string) => {
     const words = fs2.readFileSync(rutaArchivo, 'utf-8');
     return words;
 }
+
+export const getRutaFile = (ruta: string) => { 
+    let names = ruta.split(path.sep);
+    return names.slice(0, -1).join(path.sep) + path.sep;
+}
+

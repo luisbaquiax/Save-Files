@@ -8,7 +8,6 @@ const SechemaDirectory = new mongoose.Schema(
         estado: { type: String, required: true},
         username_compartido: { type: String, required: false },
         tipo: { type: String, required: true },
-        contenido: { type: String, required: false }
     },
     {
         timestamps: true,

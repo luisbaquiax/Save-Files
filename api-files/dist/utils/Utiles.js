@@ -31,11 +31,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readFile = exports.openFile = exports.writeFile = exports.crearDirectorio = exports.rutaFiles = void 0;
+exports.getRutaFile = exports.readFile = exports.openFile = exports.writeFile = exports.crearDirectorio = exports.rutaFilesShardes = exports.rutaFiles = void 0;
 const fs_1 = require("fs");
 const fs2 = __importStar(require("fs"));
+const path_1 = __importDefault(require("path"));
 exports.rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
+exports.rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
 const crearDirectorio = (ruta) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield fs_1.promises.mkdir(ruta, { recursive: true });
@@ -51,7 +56,7 @@ const writeFile = (ruta, content) => __awaiter(void 0, void 0, void 0, function*
         yield fs_1.promises.writeFile(ruta, content, {
             flag: "w"
         }).then(() => {
-            console.log("se ha escrito el archivo");
+            console.log("se ha escrito el archivo ", ruta);
         });
     }
     catch (error) {
@@ -75,3 +80,8 @@ const readFile = (rutaArchivo) => {
     return words;
 };
 exports.readFile = readFile;
+const getRutaFile = (ruta) => {
+    let names = ruta.split(path_1.default.sep);
+    return names.slice(0, -1).join(path_1.default.sep) + path_1.default.sep;
+};
+exports.getRutaFile = getRutaFile;

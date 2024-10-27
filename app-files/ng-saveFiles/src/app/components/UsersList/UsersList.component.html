@@ -1,0 +1,16 @@
+  <h1 mat-dialog-title>Compartir archivo</h1>
+  <div mat-dialog-content>
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <mat-label>Nombre de usuario</mat-label>
+          <mat-select [(ngModel)]="data" required>
+            <mat-option *ngFor="let user of users" [value]="user.username">
+              {{ user.username }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Cancelar</button>
+    <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Guardar cambios</button>
+  </div>
+

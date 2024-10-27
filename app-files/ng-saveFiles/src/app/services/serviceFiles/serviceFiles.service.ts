@@ -8,9 +8,12 @@ import { Archivo } from 'src/app/models/entidad/Archivo';
 })
 export class ServiceFilesService {
 
-urlCreate: string = 'http://localhost:3000/files/create';
-urlList: string = 'http://localhost:3000/files/list';
-urlSendFile: string = 'http://localhost:3000/files/send-image';
+private urlCreate: string = 'http://localhost:3000/files/create';
+private urlList: string = 'http://localhost:3000/files/list';
+private urlSendFile: string = 'http://localhost:3000/files/send-image';
+private urlUpdateFile: string = 'http://localhost:3000/files/updateFile';
+private urlCreateShared: string = 'http://localhost:3000/files/shared';
+private urlFilesShareds: string = 'http://localhost:3000/files/get-shareds';
 
 constructor(private http: HttpClient) { }
 
@@ -18,12 +21,21 @@ public create(file: Archivo): Observable<any> {
   return this.http.post<any>(this.urlCreate, file)
 }
 
+public createShared(shared: Archivo, tipoArchivo: string): Observable<any> {
+  return this.http.post<any>(this.urlCreateShared + `/${tipoArchivo}`, shared);
+}
 public filesByDirectory(id_directory: string, estado: string): Observable<Archivo[]>{
   return this.http.get<Archivo[]>(this.urlList + `/${id_directory}/${estado}`);
 }
-
 public sendFile(form: FormData): Observable<any>{
   return this.http.post<any>(this.urlSendFile, form);
+}
+public updateFile(archivo: Archivo): Observable<any>{
+  return this.http.put<any>(this.urlUpdateFile, archivo);
+}
+
+public filesShareds(username: string): Observable<Archivo[]>{
+  return this.http.get<Archivo[]>(this.urlFilesShareds + `/${username}`)
 }
 
 }

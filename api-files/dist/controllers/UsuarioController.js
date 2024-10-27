@@ -12,15 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
+exports.getUsersByStatus = exports.updateUser = exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
 const Utiles_1 = require("./../utils/Utiles");
 const Usuario_1 = __importDefault(require("../data/model/Usuario"));
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
 const FileState_1 = require("../enums/FileState");
 const DirectoryType_1 = require("../enums/DirectoryType");
+const UserType_1 = require("../enums/UserType");
 const getUsers = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const users = yield Usuario_1.default.find();
+        const users = yield Usuario_1.default.find({ rol: UserType_1.UserType.EMPLEADO });
         response.json(users);
     }
     catch (error) {
@@ -50,8 +51,8 @@ const insertUser = (request, response) => __awaiter(void 0, void 0, void 0, func
             username_compartido: username,
             tipo: DirectoryType_1.DirectoryType.ROOT
         });
-        raiz.save();
-        (0, Utiles_1.crearDirectorio)(rutaDirectorio);
+        yield raiz.save();
+        //crearDirectorio(rutaDirectorio);
         response.json(userCreate);
     }
     else {
@@ -115,3 +116,14 @@ const updateUser = (request, response) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.updateUser = updateUser;
+const getUsersByStatus = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { idUser } = request.params;
+        const users = yield Usuario_1.default.find({ _id: { $ne: idUser } });
+        response.json(users);
+    }
+    catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+});
+exports.getUsersByStatus = getUsersByStatus;

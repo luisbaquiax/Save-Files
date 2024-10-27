@@ -12,9 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDirectoriesByUsername = exports.getDirectoryByIdAndSatatus = exports.getDirectoriesByParent = exports.getDirectoryRoot = exports.createDirectory = void 0;
-const Utiles_1 = require("../utils/Utiles");
-const path_1 = __importDefault(require("path"));
+exports.updateDirectory = exports.getDirectoryByIdAndSatatus = exports.getDirectoriesByParent = exports.getDirectoryRoot = exports.createDirectory = void 0;
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
 const DirectoryType_1 = require("../enums/DirectoryType");
 const FileState_1 = require("../enums/FileState");
@@ -40,10 +38,9 @@ const createDirectory = (request, response) => __awaiter(void 0, void 0, void 0,
             response.status(404).json({ message: `No se encontró la carepta padre.` });
             return;
         }
-        const rutaCarpeta = carpetaPadre.ruta + path_1.default.sep + nombre;
+        const rutaCarpeta = nombre;
         carpetaNueva.ruta = rutaCarpeta;
         yield carpetaNueva.save();
-        (0, Utiles_1.crearDirectorio)(rutaCarpeta);
         response.json({ message: `Se ha guardado la carpeta con éxito.` });
     }
     catch (error) {
@@ -102,11 +99,22 @@ const getDirectoryByIdAndSatatus = (request, response) => __awaiter(void 0, void
     }
 });
 exports.getDirectoryByIdAndSatatus = getDirectoryByIdAndSatatus;
-const getDirectoriesByUsername = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+const updateDirectory = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const { carpeta } = request.body;
+        const buscado = yield Directorio_1.default.findOne({ _id: carpeta._id });
+        if (!buscado) {
+            response.status(404).json({ message: `Carpeta no encontrada` });
+            return;
+        }
+        buscado.nombre = carpeta.nombre;
+        buscado.id_directory = carpeta.id_directory;
+        buscado.estado = carpeta.estado;
+        yield buscado.save();
+        response.json({ message: `Carpeta actualizado con éxito.` });
     }
     catch (error) {
         response.status(500).json({ message: `Error en el servidor ${error}` });
     }
 });
-exports.getDirectoriesByUsername = getDirectoriesByUsername;
+exports.updateDirectory = updateDirectory;
