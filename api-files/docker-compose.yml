@@ -1,0 +1,20 @@
+version: '3.7'
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    networks:
+      mi_red:
+        ipv4_address: "172.28.0.2"
+  db:
+    image: mongo
+    networks:
+      mi_red:
+        ipv4_address: "172.28.0.3"
+networks:
+  mi_red:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "172.28.0.0/24"
