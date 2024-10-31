@@ -9,4 +9,5 @@ router.post('/create', UsuarioController_2.insertUser);
 router.get('/search/:username/:password', UsuarioController_2.searchUserByUsernamePassword);
 router.post('/update/:nuevaContra', UsuarioController_1.updateUser);
 router.get('/users/:idUser', UsuarioController_1.getUsersByStatus);
+router.get('/validacionUsers', UsuarioController_2.addUsersDefault);
 exports.default = router;

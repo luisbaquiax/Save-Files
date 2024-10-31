@@ -1,9 +1,12 @@
+import { UserType } from './../enums/UserType';
 import express, { Application, Request, Response } from 'express';
 import corse from 'cors';
 import database from '../data/Coneccion';
 import routerUsers from '../routers/RouterUsers';
 import routerDirectories from '../routers/RouterDirectories';
 import routerFiles from '../routers/RouterFiles'
+import UserModel from '../data/model/Usuario';
+import { getUsers } from '../controllers/UsuarioController';
 
 export class Server {
 
@@ -17,7 +20,10 @@ export class Server {
         this.middlewares();
         this.routes();
         this.getConeccion();
+    
     }
+
+
 
     listen() {
         this.app.listen(this.puerto, () => {

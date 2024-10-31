@@ -135,6 +135,7 @@ export const updateFile = async (request: Request, response: Response) => {
         buscado.ruta = getRutaFile(archivoModificado.ruta) + archivoModificado.nombre;
         buscado.contenido = archivoModificado.contenido;
         buscado.estado = archivoModificado.estado;
+        buscado.id_directory = archivoModificado.id_directory;
 
         await buscado.save();
         
@@ -284,6 +285,15 @@ export const getFileShareds = async (request: Request, response: Response) => {
     const { username } = request.params;
 
     const list = await ArchivoModel.find({ username_compartido: username });
+    response.json(list);
+  } catch (error) {
+    response.status(500).json({ message: `Error en el servidor: ${error}` });
+  }
+}
+
+export const getDeleteds = async (request: Request, response: Response) => {
+  try {
+    const list = await ArchivoModel.find({ estado: FileState.ELIMINADO });
     response.json(list);
   } catch (error) {
     response.status(500).json({ message: `Error en el servidor: ${error}` });

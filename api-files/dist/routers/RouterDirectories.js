@@ -6,6 +6,7 @@ const router = (0, express_1.Router)();
 router.get('/getRoot/:username', DirectoryController_1.getDirectoryRoot);
 router.get('/list/:idRoot/:estado', DirectoryController_1.getDirectoriesByParent);
 router.get('/carpeta/:id/:estado', DirectoryController_1.getDirectoryByIdAndSatatus);
+router.get('/carpetaElimnado/:estado', DirectoryController_1.getDirectoryBySatatus);
 router.post('/createDirectory/:nombre/:idParent', DirectoryController_1.createDirectory);
 router.put('/update', DirectoryController_1.updateDirectory);
 exports.default = router;

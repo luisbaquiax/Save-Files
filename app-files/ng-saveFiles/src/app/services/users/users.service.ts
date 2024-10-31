@@ -13,6 +13,7 @@ export class UsersService {
   urlUpdate: string = 'http://localhost:3000/users/update/';
   urlUserStatus: string = 'http://localhost:3000/users/users/';
   urlUsers: string = 'http://localhost:3000/users/';
+  urlValidateUsers: string = 'http://localhost:3000/users/validacionUsers';
 
   constructor(private http: HttpClient) { }
 
@@ -34,5 +35,9 @@ export class UsersService {
 
   public getUsers(): Observable<User[]>{
     return this.http.get<User[]>(this.urlUsers);
+  }
+
+  public validacionUsers(): Observable<any>{
+    return this.http.get<User[]>(this.urlValidateUsers);
   }
 }

@@ -38,11 +38,13 @@ import { EditorComponent } from './components/editor/editor.component';
 import { SelectImageComponent } from './components/select-image/select-image.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
 import { UsersListComponent } from './components/UsersList/UsersList.component';
+import { HomeAdminComponent } from './components/home-admin/home-admin.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+    HomeAdminComponent,
     MenuComponent,
     LoginComponent,
     HomeDialogDirectoryComponent,

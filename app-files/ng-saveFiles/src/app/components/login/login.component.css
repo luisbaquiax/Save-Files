@@ -39,3 +39,8 @@ input.example-right-align {
 .font-size{
   font-size: 35px;
 }
+
+.box{
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+}

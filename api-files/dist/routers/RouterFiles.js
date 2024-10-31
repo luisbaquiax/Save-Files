@@ -10,4 +10,5 @@ router.get('/list/:idRoot/:estado', FileController_1.getFilesByRootState);
 router.put('/updateFile', FileController_1.updateFile);
 router.put('/updateImage', FileController_1.updateImage);
 router.get('/get-shareds/:username', FileController_1.getFileShareds);
+router.get('/get-deleteds', FileController_1.getDeleteds);
 exports.default = router;

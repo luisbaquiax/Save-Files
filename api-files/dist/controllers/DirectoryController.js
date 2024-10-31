@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDirectory = exports.getDirectoryByIdAndSatatus = exports.getDirectoriesByParent = exports.getDirectoryRoot = exports.createDirectory = void 0;
+exports.updateDirectory = exports.getDirectoryBySatatus = exports.getDirectoryByIdAndSatatus = exports.getDirectoriesByParent = exports.getDirectoryRoot = exports.createDirectory = void 0;
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
 const DirectoryType_1 = require("../enums/DirectoryType");
 const FileState_1 = require("../enums/FileState");
@@ -97,6 +97,23 @@ const getDirectoryByIdAndSatatus = (request, response) => __awaiter(void 0, void
     }
 });
 exports.getDirectoryByIdAndSatatus = getDirectoryByIdAndSatatus;
+const getDirectoryBySatatus = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { estado } = request.params;
+        const carpeta = yield Directorio_1.default.findOne({
+            estado: estado
+        });
+        if (!carpeta) {
+            response.status(404).json({ message: `Carpeta no encontrada` });
+            return;
+        }
+        response.json(carpeta);
+    }
+    catch (error) {
+        response.status(500).json({ message: `Errro en el servidor: ${error}` });
+    }
+});
+exports.getDirectoryBySatatus = getDirectoryBySatatus;
 const updateDirectory = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { carpeta } = request.body;

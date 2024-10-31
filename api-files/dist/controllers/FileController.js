@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFileShareds = exports.updateImage = exports.copyImage = exports.getFilesByRootState = exports.updateFile = exports.createFileShared = exports.createFile = void 0;
+exports.getDeleteds = exports.getFileShareds = exports.updateImage = exports.copyImage = exports.getFilesByRootState = exports.updateFile = exports.createFileShared = exports.createFile = void 0;
 const Utiles_1 = require("./../utils/Utiles");
 const Archivo_1 = __importDefault(require("../data/model/Archivo"));
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
@@ -111,6 +111,7 @@ const updateFile = (request, response) => __awaiter(void 0, void 0, void 0, func
                 buscado.ruta = (0, Utiles_1.getRutaFile)(archivoModificado.ruta) + archivoModificado.nombre;
                 buscado.contenido = archivoModificado.contenido;
                 buscado.estado = archivoModificado.estado;
+                buscado.id_directory = archivoModificado.id_directory;
                 yield buscado.save();
                 response.json({ message: `Archivo actualizado correctamente.` });
             }
@@ -244,3 +245,13 @@ const getFileShareds = (request, response) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.getFileShareds = getFileShareds;
+const getDeleteds = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const list = yield Archivo_1.default.find({ estado: FileState_1.FileState.ELIMINADO });
+        response.json(list);
+    }
+    catch (error) {
+        response.status(500).json({ message: `Error en el servidor: ${error}` });
+    }
+});
+exports.getDeleteds = getDeleteds;

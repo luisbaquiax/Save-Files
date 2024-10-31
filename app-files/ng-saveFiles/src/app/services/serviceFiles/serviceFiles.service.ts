@@ -15,6 +15,7 @@ private urlUpdateFile: string = 'http://localhost:3000/files/updateFile';
 private urlCreateShared: string = 'http://localhost:3000/files/shared';
 private urlFilesShareds: string = 'http://localhost:3000/files/get-shareds';
 private urlUpdateImage: string = 'http://localhost:3000/files/updateImage';
+private urlFilesDeleteds: string = 'http://localhost:3000/files/get-deleteds';
 
 constructor(private http: HttpClient) { }
 
@@ -41,6 +42,10 @@ public updateImage(form: FormData): Observable<any> {
 
 public filesShareds(username: string): Observable<Archivo[]>{
   return this.http.get<Archivo[]>(this.urlFilesShareds + `/${username}`)
+}
+
+public filesDeleteds(): Observable<Archivo[]> {
+  return this.http.get<Archivo[]>(this.urlFilesDeleteds);
 }
 
 }

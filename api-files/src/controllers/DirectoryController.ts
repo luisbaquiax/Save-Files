@@ -97,6 +97,25 @@ export const getDirectoryByIdAndSatatus = async (request: Request, response: Res
     }
 }
 
+export const getDirectoryBySatatus = async (request: Request, response: Response) => {
+    try {
+        const { estado } = request.params;
+        const carpeta = await DirectoryModel.findOne({
+            estado: estado
+        });
+
+        if (!carpeta) {
+            response.status(404).json({ message: `Carpeta no encontrada` });
+            return;
+        }
+
+        response.json(carpeta);
+
+    } catch (error) {
+        response.status(500).json({ message: `Errro en el servidor: ${error}` });
+    }
+}
+
 export const updateDirectory = async (request: Request, response: Response) => {
     try {
         const { carpeta } = request.body;

@@ -13,6 +13,7 @@ export class DirectoryService {
   urlCarpeta: string = 'http://localhost:3000/directories/carpeta/';
   urlCreate: string =  'http://localhost:3000/directories/createDirectory/';
   urlUpdate: string = 'http://localhost:3000/directories/update';
+  urlGetDeleteds: string = 'http://localhost:3000/directories/carpetaElimnado/';
 
   constructor(private http: HttpClient) { }
 
@@ -34,6 +35,10 @@ export class DirectoryService {
 
   public update(direcory: Directory): Observable<any> {
     return this.http.put<any>(this.urlUpdate, { carpeta: direcory });
+  }
+
+  public getByStatus(estado: string): Observable<Directory[]> {
+    return this.http.get<Directory[]>(this.urlGetDeleteds + `/${estado}`)
   }
 
 }

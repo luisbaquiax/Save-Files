@@ -97,7 +97,7 @@ export const updateUser = async (request: Request, response: Response) => {
     try {
         const { nuevaContra } = request.params;
         const { username } = request.body;
-        
+
         const usuarioBuscado = await UserModel.findOne({ username: username });
 
         if (!usuarioBuscado) {
@@ -121,6 +121,47 @@ export const getUsersByStatus = async (request: Request, response: Response) => 
         const { idUser } = request.params;
         const users = await UserModel.find({ _id: { $ne: idUser } });
         response.json(users);
+    } catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+};
+
+export const addUsersDefault = async (request: Request, response: Response) => {
+    try {
+        // Agregar usuarios por defecto a la base de datos
+        const usersFind = await UserModel.find();
+
+        const adminUser = new UserModel({
+            nombre: 'admin',
+            apellido: 'admin',
+            email: "amdin@gmail.com",
+            password: 'admin',
+            username: 'admin', rol: UserType.ADMIN
+        });
+        const user1 =  new UserModel({
+            nombre: 'Luis',
+            apellido: 'Baquiax',
+            email: "user1@gmail.com",
+            password: '1234',
+            username: 'user1', rol: UserType.EMPLEADO
+        });
+        const user2 =  new UserModel({
+            nombre: 'Alejandro',
+            apellido: 'Gómez',
+            email: "ale@gmail.com",
+            password: '1234',
+            username: 'user2', rol: UserType.EMPLEADO
+        });
+
+        if (usersFind.length == 0) {
+            adminUser.password = await adminUser.encryptPassword(adminUser.password);
+            user1.password = await user1.encryptPassword(user1.password);
+            user2.password = await user2.encryptPassword(user2.password);
+            await adminUser.save();
+            await user1.save();
+            await user2.save();
+        }
+        response.json({ message: `Usuarios agregados` })
     } catch (error) {
         response.status(500).json({ message: `Error en el servidor ${error}` });
     }

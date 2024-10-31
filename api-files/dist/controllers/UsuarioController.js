@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUsersByStatus = exports.updateUser = exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
+exports.addUsersDefault = exports.getUsersByStatus = exports.updateUser = exports.searchUser = exports.searchUserByUsernamePassword = exports.insertUser = exports.getUsers = void 0;
 const Utiles_1 = require("./../utils/Utiles");
 const Usuario_1 = __importDefault(require("../data/model/Usuario"));
 const Directorio_1 = __importDefault(require("../data/model/Directorio"));
@@ -127,3 +127,43 @@ const getUsersByStatus = (request, response) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getUsersByStatus = getUsersByStatus;
+const addUsersDefault = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Agregar usuarios por defecto a la base de datos
+        const usersFind = yield Usuario_1.default.find();
+        const adminUser = new Usuario_1.default({
+            nombre: 'admin',
+            apellido: 'admin',
+            email: "amdin@gmail.com",
+            password: 'admin',
+            username: 'admin', rol: UserType_1.UserType.ADMIN
+        });
+        const user1 = new Usuario_1.default({
+            nombre: 'Luis',
+            apellido: 'Baquiax',
+            email: "user1@gmail.com",
+            password: '1234',
+            username: 'user1', rol: UserType_1.UserType.EMPLEADO
+        });
+        const user2 = new Usuario_1.default({
+            nombre: 'Alejandro',
+            apellido: 'Gómez',
+            email: "ale@gmail.com",
+            password: '1234',
+            username: 'user2', rol: UserType_1.UserType.EMPLEADO
+        });
+        if (usersFind.length == 0) {
+            adminUser.password = yield adminUser.encryptPassword(adminUser.password);
+            user1.password = yield user1.encryptPassword(user1.password);
+            user2.password = yield user2.encryptPassword(user2.password);
+            yield adminUser.save();
+            yield user1.save();
+            yield user2.save();
+        }
+        response.json({ message: `Usuarios agregados` });
+    }
+    catch (error) {
+        response.status(500).json({ message: `Error en el servidor ${error}` });
+    }
+});
+exports.addUsersDefault = addUsersDefault;

@@ -1,25 +1,27 @@
-import { UsersListComponent } from './../UsersList/UsersList.component';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Directory } from 'src/app/models/entidad/Directory';
 import { User } from 'src/app/models/entidad/User';
 import { DirectoryType } from 'src/app/models/enums/DirectoryType';
 import { FileState } from 'src/app/models/enums/FileState';
 import { DirectoryService } from 'src/app/services/serviceDirectories/directory.service';
 import { SesionService } from 'src/app/services/sesion/sesion.service';
-import { MatDialog } from '@angular/material/dialog';
-import { HomeDialogDirectoryComponent } from '../home-dialog-directory/home-dialog-directory.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { EditorComponent } from '../editor/editor.component';
 import { Editor } from 'src/app/models/entidad/Editor';
 import { Extensiones } from 'src/app/models/enums/Extensiones';
 import { Archivo } from 'src/app/models/entidad/Archivo';
 import { ServiceFilesService } from 'src/app/services/serviceFiles/serviceFiles.service';
-import { Dir } from '@angular/cdk/bidi';
-import { ChangePasswordComponent } from '../change-password/change-password.component';
 import { UsersService } from 'src/app/services/users/users.service';
 import { getNameFile, getDefaultContentFile } from 'src/app/models/Utiles';
 import { FileType } from 'src/app/models/enums/FileType';
+//material angular
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+//components
+import { EditorComponent } from '../editor/editor.component';
+import { ChangePasswordComponent } from '../change-password/change-password.component';
+import { HomeDialogDirectoryComponent } from '../home-dialog-directory/home-dialog-directory.component';
+import { UsersListComponent } from './../UsersList/UsersList.component';
+
 
 @Component({
   selector: 'app-home',
@@ -52,6 +54,7 @@ export class HomeComponent implements OnInit {
   showShareds: boolean = false;
   showPaste: boolean = false;
   elementCopy!: any;
+  parameter: number = 0;
 
   selectedFile: File | undefined;
 
@@ -165,7 +168,6 @@ export class HomeComponent implements OnInit {
     });
   }
   deleteDirectoryOrFile(element: any) {
-    console.log('element ', element);
     element.estado = FileState.ELIMINADO;
     if (this.isDirectory(element)) {
       this.updateDirectory(element, 'Carpeta eliminado correctamente');
@@ -177,15 +179,64 @@ export class HomeComponent implements OnInit {
   copyElement(element: any) {
     this.showPaste = true;
     this.elementCopy = JSON.parse(JSON.stringify(element));
+    this.parameter = 1;
   }
 
-  pasteELement(){
+  moveElement(element: any) {
+    this.showPaste = true;
+    this.elementCopy = JSON.parse(JSON.stringify(element));
+    this.parameter = 2;
+  }
+
+  pasteELement() {
+    if (this.parameter == 1) {
+      this.executeCopyElement();
+    } else {
+      this.excuteMoveElement();
+    }
+    this.parameter = 0;
+  }
+
+  excuteMoveElement() {
+    if (this.directoryActual._id == this.elementCopy.id_directory) {
+      this.snackBar.open('Debes elegir otra carpta para mover', 'Cerrar', { duration: 2000 })
+    } else {
+
+      this.elementCopy.nombre = 'mv-' + this.elementCopy.nombre;
+      this.elementCopy.id_directory = this.directoryActual._id;
+
+      if (this.isImage(this.elementCopy) || this.isFile(this.elementCopy)) {
+        this.serviceFile.updateFile(this.elementCopy).subscribe(() => {
+          this.updateDirectories(this.directoryActual);
+          this.snackBar.open('Archivo movido con éxito.', 'Cerrar', { duration: 2000 });
+        },
+          (error) => {
+            this.snackBar.open('No se pudo mover el archivo.', 'Cerrar', { duration: 2000 });
+          }
+        );
+      } else if (this.isDirectory(this.elementCopy)) {
+        this.serviceDirectory.update(this.elementCopy).subscribe(
+          () => {
+            this.updateDirectories(this.directoryActual);
+            this.snackBar.open('Carpeta movido con éxito.', 'Cerrar', { duration: 2000 });
+          },
+          (error) => {
+            this.snackBar.open('No se pudo mover la carpeta.', 'Cerrar', { duration: 2000 });
+          }
+        );
+      }
+      this.showPaste = false;
+    }
+
+  }
+
+  executeCopyElement() {
     this.elementCopy.nombre = 'copia-' + this.elementCopy.nombre;
     this.elementCopy.id_directory = this.directoryActual._id;
     console.log('copiar elemento ', this.elementCopy);
     if (this.isImage(this.elementCopy)) {
 
-    }else if(this.isDirectory(this.elementCopy)){
+    } else if (this.isDirectory(this.elementCopy)) {
       //directorio
       this.serviceDirectory.create(this.elementCopy.nombre, this.elementCopy.id_directory, this.elementCopy).subscribe(
         (data) => {
@@ -201,7 +252,7 @@ export class HomeComponent implements OnInit {
           }
         }
       );
-    }else{
+    } else {
       //archivo de texto
       this.serviceFile.create(this.elementCopy).subscribe(
         () => {
