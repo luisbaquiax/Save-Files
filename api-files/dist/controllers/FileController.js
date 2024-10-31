@@ -173,6 +173,7 @@ const copyImage = (request, response) => __awaiter(void 0, void 0, void 0, funct
             response.json({ message: 'Archivo recibido y guardado correctamente' });
         }
         catch (error) {
+            console.log(error);
             response.status(500).json({ message: `Error en el servidor: ${error}` });
         }
     }));
@@ -192,27 +193,33 @@ const updateImage = (request, response) => {
                 if (!request.file) {
                     return response.status(400).json({ message: 'No se ha subido ningún archivo' });
                 }
-                const archivoBuscado = yield Archivo_1.default.findOne({ nombre: archivoJson.nombre, id_directory: archivoJson.id_directory, estado: FileState_1.FileState.ACTIVO });
+                const archivoBuscado = yield Archivo_1.default.findOne({
+                    nombre: archivoJson.nombre,
+                    estado: FileState_1.FileState.ACTIVO,
+                    id_directory: archivoJson.id_directory,
+                    _id: { $ne: archivoJson._id }
+                });
                 if (archivoBuscado) {
                     return response.status(401).json({ message: `El archivo ${archivoBuscado.nombre} ya existe` });
                 }
-                const archivoNuevo = yield new Archivo_1.default({
-                    id_directory: archivoJson.id_directory,
-                    nombre: archivoJson.nombre,
-                    ruta: ' ',
-                    extension: archivoJson.extension,
-                    estado: archivoJson.estado,
-                    username_compartido: archivoJson.username_compartido,
-                    propietario: archivoJson.propietario,
-                    fecha_compartida: archivoJson.fecha_compartida,
-                    hora_compartida: archivoJson.hora_compartida,
-                    contenido: archivoJson.contenido
-                });
-                yield archivoNuevo.save();
+                const fileUPdate = yield Archivo_1.default.findOne({ _id: archivoJson._id });
+                if (!fileUPdate) {
+                    return response.status(402).json({ message: 'No se ha subido ningún archivo' });
+                }
+                fileUPdate.id_directory = archivoJson.id_directory;
+                fileUPdate.nombre = archivoJson.nombre;
+                fileUPdate.ruta = archivoJson.ruta;
+                fileUPdate.extension = archivoJson.extension;
+                fileUPdate.estado = archivoJson.estado;
+                fileUPdate.username_compartido = archivoJson.username_compartido;
+                fileUPdate.propietario = archivoJson.propietario;
+                fileUPdate.tipo_archivo = archivoJson.tipo_archivo;
+                fileUPdate.contenido = archivoJson.contenido;
+                yield fileUPdate.save();
                 //escribir la imagen
-                const rutaArchivo = Utiles_1.rutaFiles + path_1.default.sep + archivoNuevo._id + archivoJson.nombre;
-                archivoNuevo.ruta = rutaArchivo;
-                yield archivoNuevo.save();
+                const rutaArchivo = Utiles_1.rutaFiles + path_1.default.sep + fileUPdate._id + archivoJson.nombre;
+                fileUPdate.ruta = rutaArchivo;
+                yield fileUPdate.save();
                 fs_1.default.writeFileSync(rutaArchivo, request.file.buffer);
                 response.json({ message: 'Archivo recibido y guardado correctamente' });
             }

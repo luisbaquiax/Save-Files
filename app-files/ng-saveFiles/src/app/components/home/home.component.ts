@@ -50,6 +50,8 @@ export class HomeComponent implements OnInit {
 
   showHome: boolean = true;
   showShareds: boolean = false;
+  showPaste: boolean = false;
+  elementCopy!: any;
 
   selectedFile: File | undefined;
 
@@ -173,7 +175,50 @@ export class HomeComponent implements OnInit {
   }
 
   copyElement(element: any) {
-    console.log('copiar elemento ')
+    this.showPaste = true;
+    this.elementCopy = JSON.parse(JSON.stringify(element));
+  }
+
+  pasteELement(){
+    this.elementCopy.nombre = 'copia-' + this.elementCopy.nombre;
+    this.elementCopy.id_directory = this.directoryActual._id;
+    console.log('copiar elemento ', this.elementCopy);
+    if (this.isImage(this.elementCopy)) {
+
+    }else if(this.isDirectory(this.elementCopy)){
+      //directorio
+      this.serviceDirectory.create(this.elementCopy.nombre, this.elementCopy.id_directory, this.elementCopy).subscribe(
+        (data) => {
+          this.updateDirectories(this.directoryActual);
+          this.snackBar.open('Carpeta creada correctamente', 'Cerrar');
+        },
+        (error) => {
+          console.log(error)
+          if (error.status == 409) {
+            this.snackBar.open(`La carpeta ${this.elementCopy.nombre} ya existe`, 'Cerrar', { duration: 2000 });
+          } else {
+            this.snackBar.open('No se pudo guardar la carpeta', 'Cerrar');
+          }
+        }
+      );
+    }else{
+      //archivo de texto
+      this.serviceFile.create(this.elementCopy).subscribe(
+        () => {
+          this.updateDirectories(this.directoryActual);
+          this.snackBar.open('Archivo creado correctamente', 'Cerrar');
+        },
+        (error) => {
+          console.log(error)
+          if (error.status == 409) {
+            this.snackBar.open(`El archivo ${this.elementCopy.nombre} ya existe`, 'Cerrar', { duration: 2000 });
+          } else {
+            this.snackBar.open('No se pudo guardar el archivo', 'Cerrar');
+          }
+        }
+      );
+    }
+    this.showPaste = false;
   }
 
   updateDirectories(directoryActual: Directory) {
@@ -375,7 +420,10 @@ export class HomeComponent implements OnInit {
   }
 
   isImage(archivo: Archivo) {
-    return archivo.extension == Extensiones.JPG || archivo.extension == Extensiones.PNG;
+    return archivo.extension == Extensiones.JPG
+      || archivo.extension == Extensiones.PNG
+      || archivo.extension == '.PNG'
+      || archivo.extension == '.JPG';
   }
 
   onNoClick() {
@@ -403,14 +451,13 @@ export class HomeComponent implements OnInit {
         updatedAt: '',
       }
 
-      if (fileExtension == Extensiones.PNG || fileExtension == Extensiones.JPG) {
-        console.log('todo bien')
+      if (this.isImage(archivo)) {
         const form = new FormData();
         form.append('archivo', this.selectedFile);
         form.append('archivoJson', JSON.stringify(archivo));
         this.serviceFile.sendFile(form).subscribe(
           () => {
-            this.updateDirectories(this.directoryActual)
+            this.updateDirectories(this.directoryActual);
             this.snackBar.open(`Se ha guardado correctamente el archivo`, 'Cerrar', { duration: 2000 })
           },
           (error) => {
@@ -418,6 +465,7 @@ export class HomeComponent implements OnInit {
               this.snackBar.open(`El archivo ${archivo.nombre} ya existe`, 'Cerrar', { duration: 2000 })
             } else {
               console.log(error)
+              this.snackBar.open(`No se pudo guardar la imagen`, 'Cerrar', { duration: 2000 })
             }
           }
         );
@@ -429,8 +477,55 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  uploadImageChange(event: any, archivo: Archivo) {
-    console.log('cambiando imagen ', archivo)
+  uploadImageChange(event: any, element: Archivo) {
+    this.selectedFile = event.target.files[0];
+    if (this.selectedFile) {
+
+      const descriptionFile = this.selectedFile.name.split('.');
+      const fileExtension = '.' + descriptionFile[descriptionFile.length - 1];
+
+      const archivo: Archivo = {
+        _id: element._id,
+        id_directory: element.id_directory,
+        nombre: this.selectedFile.name,
+        ruta: this.directoryActual.ruta,
+        extension: fileExtension,
+        estado: FileState.ACTIVO,
+        username_compartido: ' ',
+        propietario: this.user.username,
+        tipo_archivo: FileType.NORMAL,
+        contenido: getDefaultContentFile(),
+        createdAt: '',
+        updatedAt: '',
+      }
+
+      if (fileExtension == Extensiones.PNG || fileExtension == Extensiones.JPG) {
+        console.log('todo bien')
+        const form = new FormData();
+        form.append('archivo', this.selectedFile);
+        form.append('archivoJson', JSON.stringify(archivo));
+        this.serviceFile.updateImage(form).subscribe(
+          () => {
+            this.updateDirectories(this.directoryActual);
+            this.snackBar.open('Se ha actualizado correctamen la imagen', 'Cerrar', { duration: 2000 });
+          },
+          (error) => {
+            console.log(error)
+            if (error.status == 400) {
+              this.snackBar.open('No se seleccion ningún archivo', 'Cerrar', { duration: 2000 });
+            } else if (error.status == 401) {
+              this.snackBar.open(`El archivo ${archivo.nombre} ya existe`, 'Cerrar', { duration: 2000 });
+            } else {
+              this.snackBar.open('No se pudo guardar los cambios', 'Cerrar', { duration: 2000 });
+            }
+          }
+        );
+      }
+
+    } else {
+      this.snackBar.open('No se selecciono ningún archivo', 'Cerrar', { duration: 2000 });
+    }
+
   }
 
 

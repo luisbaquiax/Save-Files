@@ -10,9 +10,7 @@ export const createDirectory = async (request: Request, response: Response) => {
         const { nombre, idParent } = request.params;
         const carpeta = request.body;
 
-        if (carpeta._id === '') {
-            delete carpeta._id;
-        }
+        delete carpeta._id;
 
         const buscado = await DirectoryModel.findOne({
             nombre: nombre, id_directory: idParent, estado: FileState.ACTIVO

@@ -70,6 +70,11 @@
               </button>
               <input hidden (change)="uploadImage($event)" #fileInput type="file" accept=".jpg, .png">
           </div>
+          <div class="col-auto" *ngIf="showPaste">
+            <a mat-raised-button color="" (click)="pasteELement()">
+              <mat-icon>content_paste_go</mat-icon>Pegar
+            </a>
+          </div>
         </div>
 
       </div>

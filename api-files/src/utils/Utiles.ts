@@ -2,8 +2,11 @@ import { promises as fs } from 'fs';
 import * as fs2 from 'fs';
 import path from 'path';
 
-export const rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
-export const rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
+//export const rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
+//export const rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
+
+export const rutaFiles = path.resolve(__dirname, '../img/');
+export const rutaFilesShardes = path.resolve(__dirname, '../shared/');
 
 export const crearDirectorio = async (ruta: string) => {
     try {

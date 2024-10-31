@@ -20,9 +20,7 @@ const createDirectory = (request, response) => __awaiter(void 0, void 0, void 0,
     try {
         const { nombre, idParent } = request.params;
         const carpeta = request.body;
-        if (carpeta._id === '') {
-            delete carpeta._id;
-        }
+        delete carpeta._id;
         const buscado = yield Directorio_1.default.findOne({
             nombre: nombre, id_directory: idParent, estado: FileState_1.FileState.ACTIVO
         });

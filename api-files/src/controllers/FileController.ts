@@ -208,6 +208,7 @@ export const copyImage = async (request: Request, response: Response) => {
 
       response.json({ message: 'Archivo recibido y guardado correctamente' });
     } catch (error) {
+      console.log(error);
       response.status(500).json({ message: `Error en el servidor: ${error}` });
     }
   });
@@ -230,33 +231,41 @@ export const updateImage = (request: Request, response: Response) =>{
         }
   
         const archivoBuscado  = await ArchivoModel.findOne(
-          { nombre: archivoJson.nombre, id_directory: archivoJson.id_directory, estado: FileState.ACTIVO }
+          { 
+            nombre: archivoJson.nombre, 
+            estado: FileState.ACTIVO, 
+            id_directory: archivoJson.id_directory,
+            _id: { $ne: archivoJson._id }
+          }
         );
   
         if(archivoBuscado){
           return response.status(401).json({ message: `El archivo ${archivoBuscado.nombre} ya existe` });
         }
+
+        const fileUPdate = await ArchivoModel.findOne({ _id: archivoJson._id });
+
+        if (!fileUPdate) {
+          return response.status(402).json({ message: 'No se ha subido ningún archivo' });
+        }
   
-        const archivoNuevo = await new ArchivoModel({ 
-          id_directory: archivoJson.id_directory,
-          nombre: archivoJson.nombre,
-          ruta: ' ',
-          extension: archivoJson.extension,
-          estado: archivoJson.estado,
-          username_compartido: archivoJson.username_compartido,
-          propietario: archivoJson.propietario,
-          fecha_compartida: archivoJson.fecha_compartida,
-          hora_compartida: archivoJson.hora_compartida,
-          contenido: archivoJson.contenido
-        });
+        fileUPdate.id_directory = archivoJson.id_directory;
+        fileUPdate.nombre = archivoJson.nombre;
+        fileUPdate.ruta =   archivoJson.ruta;
+        fileUPdate.extension = archivoJson.extension;
+        fileUPdate.estado = archivoJson.estado;
+        fileUPdate.username_compartido = archivoJson.username_compartido;
+        fileUPdate.propietario = archivoJson.propietario;
+        fileUPdate.tipo_archivo = archivoJson.tipo_archivo;
+        fileUPdate.contenido = archivoJson.contenido;
   
-        await archivoNuevo.save();
+        await fileUPdate.save();
         
         //escribir la imagen
-        const rutaArchivo = rutaFiles + path.sep + archivoNuevo._id + archivoJson.nombre;
+        const rutaArchivo = rutaFiles + path.sep + fileUPdate._id + archivoJson.nombre;
   
-        archivoNuevo.ruta = rutaArchivo;
-        await archivoNuevo.save();
+        fileUPdate.ruta = rutaArchivo;
+        await fileUPdate.save();
   
         fs.writeFileSync(rutaArchivo, request.file.buffer);
   

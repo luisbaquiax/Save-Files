@@ -13,7 +13,7 @@ const SchemaFile = new mongoose_1.default.Schema({
     username_compartido: { type: String, required: false },
     propietario: { type: String, required: false },
     contenido: { type: String, required: true },
-    tipo_archivo: { type: String, required: true }
+    tipo_archivo: { type: String, required: true } //
 }, {
     timestamps: true,
     versionKey: false

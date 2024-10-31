@@ -1,0 +1,5 @@
+docker network connect redfiles mongodb
+docker network connect redfiles api-files
+
+
+docker network create redfiles

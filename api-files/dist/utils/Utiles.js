@@ -39,8 +39,10 @@ exports.getRutaFile = exports.readFile = exports.openFile = exports.writeFile = 
 const fs_1 = require("fs");
 const fs2 = __importStar(require("fs"));
 const path_1 = __importDefault(require("path"));
-exports.rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
-exports.rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
+//export const rutaFiles = '/home/luisbaquiax/Documentos/GraFiles/';
+//export const rutaFilesShardes = '/home/luisbaquiax/Documentos/GraFilesShared/';
+exports.rutaFiles = path_1.default.resolve(__dirname, '../img/');
+exports.rutaFilesShardes = path_1.default.resolve(__dirname, '../shared/');
 const crearDirectorio = (ruta) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield fs_1.promises.mkdir(ruta, { recursive: true });
