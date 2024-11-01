@@ -18,10 +18,10 @@ Dockerizar el proyecto:
         opcion 2 (recomendada): run --name api-files --env-file=./.env --network redfiles -p 3000:3000 api-files
 
 
-    create network redfiles
+    docker network create redfiles
 
     docker network connect redfiles mongodb
     docker network connect redfiles api-files
 
 
-    docker network create redfiles
+
